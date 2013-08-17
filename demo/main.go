@@ -3,27 +3,25 @@ package main
 import (
 	"fmt"
 	"github.com/elsonwu/restapi"
-	// "net/url"
+	"net/url"
 )
 
 type User struct {
 	restapi.Api
 }
 
-// func (self *User) GET(params restapi.Params) restapi.Output {
-// 	fmt.Println("User get ", params)
+func (self *User) GET(params restapi.Params) restapi.Output {
 
-// 	url := url.URL{}
-// 	query := url.Query()
-// 	query.Add("with_content_user", "1")
-// 	query.Add("with_content_comments", "1")
-// 	params2 := restapi.Params{Query: query}
-// 	return restapi.Call("content", restapi.MethodGet, params2)
-// }
+	url := url.URL{}
+	query := url.Query()
+	query.Add("with_content_user", "1")
+	query.Add("with_content_comments", "1")
+	params2 := restapi.Params{Query: query}
+	return restapi.Call("content", restapi.MethodGet, params2)
+}
 
 func (self *User) POST(params restapi.Params) restapi.Output {
-	fmt.Println("User post ", params)
-	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"}, nil)
+	return restapi.SetupOutput(true, restapi.Map{"user": "post", "params": params}, nil)
 }
 
 type Content struct {
@@ -31,17 +29,16 @@ type Content struct {
 }
 
 func (self *Content) GET(params restapi.Params) restapi.Output {
-	fmt.Println("Content get ", params)
-	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"}, nil)
+	return restapi.SetupOutput(true, restapi.Map{"content": "get", "params": params}, nil)
 }
 
 func (self *Content) POST(params restapi.Params) restapi.Output {
-	fmt.Println("Content post ", params)
-	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"}, nil)
+	return restapi.SetupOutput(true, restapi.Map{"content": "post", "params": params}, nil)
 }
 
 func main() {
+	fmt.Println("binding:8888")
 	restapi.Add("user", &User{})
 	restapi.Add("content", &Content{})
-	restapi.Run()
+	restapi.Run(":8888")
 }

@@ -67,7 +67,29 @@ func init() {
 	apis = make(map[string]IApi)
 }
 
+func bind(apiName string, api IApi) {
+	http.HandleFunc("/"+apiName, func(res http.ResponseWriter, req *http.Request) {
+		params := Params{Query: req.URL.Query()}
+
+		var output Output
+		if "GET" == req.Method {
+			output = api.GET(params)
+		} else if "POST" == req.Method {
+			output = api.POST(params)
+		} else if "PUT" == req.Method {
+			output = api.PUT(params)
+		} else if "DELETE" == req.Method {
+			output = api.DELETE(params)
+		}
+
+		data, _ := json.Marshal(output)
+		res.Header().Set("Content-Type", "application/json")
+		res.Write([]byte(data))
+	})
+}
+
 func Add(apiName string, api IApi) {
+	bind(apiName, api)
 	apiName = strings.ToLower(apiName)
 	apis[apiName] = api
 }
@@ -87,16 +109,6 @@ func Call(apiName, method string, params Params) Output {
 	return SetupOutput(false, nil, []string{"api - " + apiName + " does not exist"})
 }
 
-func Run() {
-	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-		apiName := strings.Trim(req.URL.Path, "/")
-		params := Params{Query: req.URL.Query()}
-		output := Call(apiName, req.Method, params)
-
-		data, _ := json.Marshal(output)
-		res.Header().Set("Content-Type", "application/json")
-		res.Write([]byte(data))
-	})
-
-	http.ListenAndServe(":8888", nil)
+func Run(bindString string) {
+	http.ListenAndServe(bindString, nil)
 }
