@@ -26,10 +26,7 @@ func (self *User) GET(params restapi.Params) restapi.Output {
 
 func (self *User) POST(params restapi.Params) restapi.Output {
 	fmt.Println("User post ", params)
-	output := restapi.Output{}
-	output.Result = true
-	output.Data = map[string]interface{}{"hello": "elson"}
-	return output
+	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"})
 }
 
 type Content struct {
@@ -37,18 +34,12 @@ type Content struct {
 
 func (self *Content) GET(params restapi.Params) restapi.Output {
 	fmt.Println("Content get ", params)
-	output := restapi.Output{}
-	output.Result = true
-	output.Data = map[string]interface{}{"hello": "elson"}
-	return output
+	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"})
 }
 
 func (self *Content) POST(params restapi.Params) restapi.Output {
 	fmt.Println("Content post ", params)
-	output := restapi.Output{}
-	output.Result = true
-	output.Data = map[string]interface{}{"hello": "elson"}
-	return output
+	return restapi.SetupOutput(true, restapi.Map{"hello": "xxx"})
 }
 
 func main() {

@@ -13,9 +13,18 @@ type Params struct {
 	Query url.Values
 }
 
+type Map map[string]interface{}
+
+func SetupOutput(Result bool, Data Map) Output {
+	output := Output{}
+	output.Result = Result
+	output.Data = Data
+	return output
+}
+
 type Output struct {
-	Result bool
-	Data   map[string]interface{}
+	Result bool                   `json:"result"`
+	Data   map[string]interface{} `json:"data"`
 }
 
 type IApi interface{}
