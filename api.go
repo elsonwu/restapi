@@ -28,38 +28,38 @@ func (self apis) Get(apiName string) IApi {
 }
 
 type IApi interface {
-	GET(Params) Output
-	POST(Params) Output
-	PUT(Params) Output
-	DELETE(Params) Output
-	SetOwner(owner *Handler)
-	Owner() *Handler
+	GET(Params) IOutput
+	POST(Params) IOutput
+	PUT(Params) IOutput
+	DELETE(Params) IOutput
+	SetOwner(owner IHandler)
+	Owner() IHandler
 }
 
 type Api struct {
-	owner *Handler
+	owner IHandler
 }
 
-func (self *Api) SetOwner(owner *Handler) {
+func (self *Api) SetOwner(owner IHandler) {
 	self.owner = owner
 }
 
-func (self *Api) Owner() *Handler {
+func (self *Api) Owner() IHandler {
 	return self.owner
 }
 
-func (self *Api) GET(params Params) Output {
+func (self *Api) GET(params Params) IOutput {
 	return SetupOutput(false, Map{}, []string{"Does not support GET method"}, 0)
 }
 
-func (self *Api) POST(params Params) Output {
+func (self *Api) POST(params Params) IOutput {
 	return SetupOutput(false, Map{}, []string{"Does not support POST method"}, 0)
 }
 
-func (self *Api) PUT(params Params) Output {
+func (self *Api) PUT(params Params) IOutput {
 	return SetupOutput(false, Map{}, []string{"Does not support PUT method"}, 0)
 }
 
-func (self *Api) DELETE(params Params) Output {
+func (self *Api) DELETE(params Params) IOutput {
 	return SetupOutput(false, Map{}, []string{"Does not support DELETE method"}, 0)
 }

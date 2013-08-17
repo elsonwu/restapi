@@ -36,13 +36,18 @@ func bind(apiName string) {
 		handler := new(Handler)
 		handler.req = req
 		output := handler.Call(apiName, req.Method, params)
-		if 0 == output.StatusCode || 200 == output.StatusCode {
-			data, _ := json.Marshal(output)
+		if 0 == output.StatusCode() || 200 == output.StatusCode() {
+			o := map[string]interface{}{}
+			o["result"] = output.Result()
+			o["data"] = output.Data()
+			o["errors"] = output.Errors()
+
+			data, _ := json.Marshal(o)
 			res.Header().Set("Content-Type", "application/json")
 			res.Write([]byte(data))
 		} else {
-		    //@todo handle error
-			http.Error(res, "", output.StatusCode)
+			//@todo handle error
+			http.Error(res, "", output.StatusCode())
 		}
 	})
 }

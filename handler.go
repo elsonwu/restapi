@@ -5,15 +5,15 @@ import (
 	"reflect"
 )
 
+type IHandler interface {
+	Call(apiName, method string, params Params) IOutput
+}
+
 type Handler struct {
 	req *http.Request
 }
 
-func (self *Handler) Req() *http.Request {
-	return self.req
-}
-
-func (self *Handler) Call(apiName, method string, params Params) Output {
+func (self *Handler) Call(apiName, method string, params Params) IOutput {
 	api := _apis.Get(apiName)
 
 	if nil != api {
