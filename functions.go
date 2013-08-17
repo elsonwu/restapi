@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"encoding/json"
+	// "errors"
 	"net/http"
 	// "net/url"
 	// "fmt"
@@ -35,9 +36,14 @@ func bind(apiName string) {
 		handler := new(Handler)
 		handler.req = req
 		output := handler.Call(apiName, req.Method, params)
-		data, _ := json.Marshal(output)
-		res.Header().Set("Content-Type", "application/json")
-		res.Write([]byte(data))
+		if 0 == output.StatusCode || 200 == output.StatusCode {
+			data, _ := json.Marshal(output)
+			res.Header().Set("Content-Type", "application/json")
+			res.Write([]byte(data))
+		} else {
+		    //@todo handle error
+			http.Error(res, "", output.StatusCode)
+		}
 	})
 }
 

@@ -34,5 +34,5 @@ func (self *Handler) Call(apiName, method string, params Params) Output {
 		}
 	}
 
-	return SetupOutput(false, nil, []string{"API(" + apiName + ") does not exist"})
+	return SetupOutput(false, nil, []string{"API(" + apiName + ") does not exist"}, 0)
 }

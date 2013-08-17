@@ -49,17 +49,17 @@ func (self *Api) Owner() *Handler {
 }
 
 func (self *Api) GET(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support GET method"})
+	return SetupOutput(false, Map{}, []string{"Does not support GET method"}, 0)
 }
 
 func (self *Api) POST(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support POST method"})
+	return SetupOutput(false, Map{}, []string{"Does not support POST method"}, 0)
 }
 
 func (self *Api) PUT(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support PUT method"})
+	return SetupOutput(false, Map{}, []string{"Does not support PUT method"}, 0)
 }
 
 func (self *Api) DELETE(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support DELETE method"})
+	return SetupOutput(false, Map{}, []string{"Does not support DELETE method"}, 0)
 }
