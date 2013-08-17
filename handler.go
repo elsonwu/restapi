@@ -9,10 +9,10 @@ type Handler struct {
 	req *http.Request
 }
 
-func (self *Handler) Call(apiName, method string, params Params) Output {
-	return Call(apiName, method, params)
+func (self *Handler) Call(apiName, method string, params Params, rs IRuntimes) Output {
+	return Call(apiName, method, params, rs)
 }
 
-func (self *Handler) innerCall(api IApi, method string, params Params) Output {
-	return innerCall(api, method, params)
+func (self *Handler) innerCall(api IApi, method string, params Params, rs IRuntimes) Output {
+	return innerCall(api, method, params, rs)
 }
