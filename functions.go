@@ -2,11 +2,18 @@ package restapi
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
+)
+
+const (
+	MethodGet    string = "GET"
+	MethodPost   string = "POST"
+	MethodPut    string = "PUT"
+	MethodDelete string = "DELETE"
 )
 
 type Params struct {
@@ -15,19 +22,44 @@ type Params struct {
 
 type Map map[string]interface{}
 
-func SetupOutput(Result bool, Data Map) Output {
+func SetupOutput(Result bool, Data Map, errors []string) Output {
 	output := Output{}
 	output.Result = Result
 	output.Data = Data
+	output.Errors = errors
 	return output
 }
 
 type Output struct {
 	Result bool                   `json:"result"`
 	Data   map[string]interface{} `json:"data"`
+	Errors []string               `json:"errors"`
 }
 
-type IApi interface{}
+type IApi interface {
+	GET(Params) Output
+	POST(Params) Output
+	PUT(Params) Output
+	DELETE(Params) Output
+}
+
+type Api struct{}
+
+func (self *Api) GET(params Params) Output {
+	return SetupOutput(false, Map{}, []string{"Does not support get method"})
+}
+
+func (self *Api) POST(params Params) Output {
+	return SetupOutput(false, Map{}, []string{"Does not support post method"})
+}
+
+func (self *Api) PUT(params Params) Output {
+	return SetupOutput(false, Map{}, []string{"Does not support put method"})
+}
+
+func (self *Api) DELETE(params Params) Output {
+	return SetupOutput(false, Map{}, []string{"Does not support delete method"})
+}
 
 var apis map[string]IApi
 
@@ -50,11 +82,9 @@ func Call(apiName, method string, params Params) Output {
 		if v, ok := refReturn[0].Interface().(Output); ok {
 			return v
 		}
-	} else {
-		fmt.Println("api - " + apiName + " does not exist")
 	}
 
-	return Output{}
+	return SetupOutput(false, nil, []string{"api - " + apiName + " does not exist"})
 }
 
 func Run() {
