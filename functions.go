@@ -5,7 +5,7 @@ import (
 	// "fmt"
 	"net/http"
 	"net/url"
-	"reflect"
+	// "reflect"
 	"strings"
 )
 
@@ -70,18 +70,7 @@ func init() {
 func bind(apiName string, api IApi) {
 	http.HandleFunc("/"+apiName, func(res http.ResponseWriter, req *http.Request) {
 		params := Params{Query: req.URL.Query()}
-
-		var output Output
-		if "GET" == req.Method {
-			output = api.GET(params)
-		} else if "POST" == req.Method {
-			output = api.POST(params)
-		} else if "PUT" == req.Method {
-			output = api.PUT(params)
-		} else if "DELETE" == req.Method {
-			output = api.DELETE(params)
-		}
-
+		output := innerCall(api, req.Method, params)
 		data, _ := json.Marshal(output)
 		res.Header().Set("Content-Type", "application/json")
 		res.Write([]byte(data))
@@ -94,16 +83,27 @@ func Add(apiName string, api IApi) {
 	apis[apiName] = api
 }
 
+func innerCall(api IApi, method string, params Params) Output {
+
+	var output Output
+	if MethodGet == method {
+		output = api.GET(params)
+	} else if MethodPost == method {
+		output = api.POST(params)
+	} else if MethodPut == method {
+		output = api.PUT(params)
+	} else if MethodDelete == method {
+		output = api.DELETE(params)
+	}
+
+	return output
+}
+
 func Call(apiName, method string, params Params) Output {
 	apiName = strings.ToLower(apiName)
 	api, ok := apis[apiName]
 	if ok {
-		refValue := reflect.ValueOf(api)
-		refValueParams := reflect.ValueOf(params)
-		refReturn := refValue.MethodByName(method).Call([]reflect.Value{refValueParams})
-		if v, ok := refReturn[0].Interface().(Output); ok {
-			return v
-		}
+		return innerCall(api, method, params)
 	}
 
 	return SetupOutput(false, nil, []string{"api - " + apiName + " does not exist"})
