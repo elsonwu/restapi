@@ -33,22 +33,21 @@ func bind(apiName string) {
 	http.HandleFunc("/"+apiName, func(res http.ResponseWriter, req *http.Request) {
 		params := Params{}
 		params.Query = req.URL.Query()
+		if MethodPost == req.Method || MethodPut == req.Method {
+			req.ParseForm()
+		}
+
 		handler := new(Handler)
 		handler.req = req
-		output := handler.Call(apiName, req.Method, params)
-		if 0 == output.StatusCode() || 200 == output.StatusCode() {
-			o := map[string]interface{}{}
-			o["result"] = output.Result()
-			o["data"] = output.Data()
-			o["errors"] = output.Errors()
 
-			data, _ := json.Marshal(o)
-			res.Header().Set("Content-Type", "application/json")
-			res.Write([]byte(data))
-		} else {
-			//@todo handle error
-			http.Error(res, "", output.StatusCode())
-		}
+		output := handler.Call(apiName, req.Method, params)
+		o := map[string]interface{}{}
+		o["result"] = output.Result()
+		o["data"] = output.Data()
+		o["errors"] = output.Errors()
+		data, _ := json.Marshal(o)
+		res.Header().Set("Content-Type", "application/json")
+		res.Write([]byte(data))
 	})
 }
 
