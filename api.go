@@ -1,8 +1,31 @@
 package restapi
 
 import (
-// "net/http"
+	"strings"
 )
+
+var _apis apis
+
+func init() {
+	_apis = make(apis)
+}
+
+type apis map[string]IApi
+
+func (self apis) Add(apiName string, api IApi) {
+	apiName = strings.ToLower(apiName)
+	self[apiName] = api
+}
+
+func (self apis) Get(apiName string) IApi {
+	apiName = strings.ToLower(apiName)
+	api, ok := self[apiName]
+	if ok {
+		return api
+	}
+
+	return nil
+}
 
 type IApi interface {
 	GET(Params) Output
@@ -26,17 +49,17 @@ func (self *Api) Owner() *Handler {
 }
 
 func (self *Api) GET(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support get method"})
+	return SetupOutput(false, Map{}, []string{"Does not support GET method"})
 }
 
 func (self *Api) POST(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support post method"})
+	return SetupOutput(false, Map{}, []string{"Does not support POST method"})
 }
 
 func (self *Api) PUT(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support put method"})
+	return SetupOutput(false, Map{}, []string{"Does not support PUT method"})
 }
 
 func (self *Api) DELETE(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support delete method"})
+	return SetupOutput(false, Map{}, []string{"Does not support DELETE method"})
 }

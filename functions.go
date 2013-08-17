@@ -6,7 +6,6 @@ import (
 	// "net/url"
 	// "fmt"
 	// "reflect"
-	"strings"
 )
 
 const (
@@ -15,12 +14,6 @@ const (
 	MethodPut    string = "PUT"
 	MethodDelete string = "DELETE"
 )
-
-var _apis apis
-
-func init() {
-	_apis = make(apis)
-}
 
 type IQuery interface {
 	Add(string, string)
@@ -35,30 +28,12 @@ type Params struct {
 
 type Map map[string]interface{}
 
-type apis map[string]IApi
-
-func (self apis) Add(apiName string, api IApi) {
-	apiName = strings.ToLower(apiName)
-	self[apiName] = api
-}
-
-func (self apis) Get(apiName string) IApi {
-	apiName = strings.ToLower(apiName)
-	api, ok := self[apiName]
-	if ok {
-		return api
-	}
-
-	return nil
-}
-
 func bind(apiName string) {
 	http.HandleFunc("/"+apiName, func(res http.ResponseWriter, req *http.Request) {
 		params := Params{}
 		params.Query = req.URL.Query()
 		handler := new(Handler)
 		handler.req = req
-		handler.res = res
 		output := handler.Call(apiName, req.Method, params)
 		data, _ := json.Marshal(output)
 		res.Header().Set("Content-Type", "application/json")
