@@ -2,10 +2,8 @@ package restapi
 
 import (
 	"encoding/json"
-	// "fmt"
 	"net/http"
 	"net/url"
-	// "reflect"
 	"strings"
 )
 
@@ -22,45 +20,6 @@ type Params struct {
 
 type Map map[string]interface{}
 
-func SetupOutput(Result bool, Data Map, errors []string) Output {
-	output := Output{}
-	output.Result = Result
-	output.Data = Data
-	output.Errors = errors
-	return output
-}
-
-type Output struct {
-	Result bool                   `json:"result"`
-	Data   map[string]interface{} `json:"data"`
-	Errors []string               `json:"errors"`
-}
-
-type IApi interface {
-	GET(Params) Output
-	POST(Params) Output
-	PUT(Params) Output
-	DELETE(Params) Output
-}
-
-type Api struct{}
-
-func (self *Api) GET(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support get method"})
-}
-
-func (self *Api) POST(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support post method"})
-}
-
-func (self *Api) PUT(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support put method"})
-}
-
-func (self *Api) DELETE(params Params) Output {
-	return SetupOutput(false, Map{}, []string{"Does not support delete method"})
-}
-
 var apis map[string]IApi
 
 func init() {
@@ -70,7 +29,10 @@ func init() {
 func bind(apiName string, api IApi) {
 	http.HandleFunc("/"+apiName, func(res http.ResponseWriter, req *http.Request) {
 		params := Params{Query: req.URL.Query()}
-		output := innerCall(api, req.Method, params)
+		handler := new(Handler)
+		handler.res = res
+		handler.req = req
+		output := handler.innerCall(api, req.Method, params)
 		data, _ := json.Marshal(output)
 		res.Header().Set("Content-Type", "application/json")
 		res.Write([]byte(data))
