@@ -28,11 +28,14 @@ func (self apis) Get(apiName string) IApi {
 }
 
 type IApi interface {
-	GET(Params) IOutput
-	POST(Params) IOutput
-	PUT(Params) IOutput
-	DELETE(Params) IOutput
-	SetOwner(owner IHandler)
+	View(Params) IOutput
+	List(Params) IOutput
+	Create(Params) IOutput
+	Update(Params) IOutput
+	Delete(Params) IOutput
+	UpdateAll(Params) IOutput
+	DeleteAll(Params) IOutput
+	SetOwner(IHandler)
 	Owner() IHandler
 }
 
@@ -48,18 +51,30 @@ func (self *Api) Owner() IHandler {
 	return self.owner
 }
 
-func (self *Api) GET(params Params) IOutput {
-	return Output(false, Map{}, []string{"Does not support GET method"})
+func (self *Api) View(params Params) IOutput {
+	return nil
 }
 
-func (self *Api) POST(params Params) IOutput {
-	return Output(false, Map{}, []string{"Does not support POST method"})
+func (self *Api) Create(params Params) IOutput {
+	return nil
 }
 
-func (self *Api) PUT(params Params) IOutput {
-	return Output(false, Map{}, []string{"Does not support PUT method"})
+func (self *Api) Update(params Params) IOutput {
+	return nil
 }
 
-func (self *Api) DELETE(params Params) IOutput {
-	return Output(false, Map{}, []string{"Does not support DELETE method"})
+func (self *Api) Delete(params Params) IOutput {
+	return nil
+}
+
+func (self *Api) List(params Params) IOutput {
+	return nil
+}
+
+func (self *Api) UpdateAll(params Params) IOutput {
+	return nil
+}
+
+func (self *Api) DeleteAll(params Params) IOutput {
+	return nil
 }
