@@ -2,7 +2,7 @@ package restapi
 
 import ()
 
-func Output(Result bool, Data Map, errors []string) IOutput {
+func Output(Result bool, Data interface{}, errors []string) IOutput {
 	o := &output{}
 	o.result = Result
 	o.data = Data
@@ -12,21 +12,21 @@ func Output(Result bool, Data Map, errors []string) IOutput {
 
 type IOutput interface {
 	Result() bool
-	Data() map[string]interface{}
+	Data() interface{}
 	Errors() []string
 }
 
 type output struct {
-	result bool                   `json:"result"`
-	data   map[string]interface{} `json:"data"`
-	errors []string               `json:"errors"`
+	result bool        `json:"result"`
+	data   interface{} `json:"data"`
+	errors []string    `json:"errors"`
 }
 
 func (self *output) Result() bool {
 	return self.result
 }
 
-func (self *output) Data() map[string]interface{} {
+func (self *output) Data() interface{} {
 	return self.data
 }
 

@@ -25,5 +25,5 @@ func (self *User) Create(params restapi.Params) restapi.IOutput {
 }
 
 func (self *User) List(params restapi.Params) restapi.IOutput {
-	return restapi.Output(true, restapi.Map{"xxx": "yyy"}, nil)
+	return restapi.Output(true, []restapi.Map{restapi.Map{"xxx": "yyy"}, restapi.Map{"eeee": "ssss"}}, nil)
 }
