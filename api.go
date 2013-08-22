@@ -19,8 +19,7 @@ func (self apis) Add(apiName string, api IApi) {
 
 func (self apis) Get(apiName string) IApi {
 	apiName = strings.ToLower(apiName)
-	api, ok := self[apiName]
-	if ok {
+	if api, ok := self[apiName]; ok {
 		return api
 	}
 
@@ -28,53 +27,41 @@ func (self apis) Get(apiName string) IApi {
 }
 
 type IApi interface {
-	View(Params) IOutput
-	List(Params) IOutput
-	Create(Params) IOutput
-	Update(Params) IOutput
-	Delete(Params) IOutput
-	UpdateAll(Params) IOutput
-	DeleteAll(Params) IOutput
-	SetOwner(IHandler)
-	Owner() IHandler
+	View(IContext) IOutput
+	List(IContext) IOutput
+	Create(IContext) IOutput
+	Update(IContext) IOutput
+	Delete(IContext) IOutput
+	UpdateAll(IContext) IOutput
+	DeleteAll(IContext) IOutput
 }
 
-type Api struct {
-	owner IHandler
-}
+type Api struct{}
 
-func (self *Api) SetOwner(owner IHandler) {
-	self.owner = owner
-}
-
-func (self *Api) Owner() IHandler {
-	return self.owner
-}
-
-func (self *Api) View(params Params) IOutput {
+func (self *Api) View(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) Create(params Params) IOutput {
+func (self *Api) Create(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) Update(params Params) IOutput {
+func (self *Api) Update(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) Delete(params Params) IOutput {
+func (self *Api) Delete(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) List(params Params) IOutput {
+func (self *Api) List(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) UpdateAll(params Params) IOutput {
+func (self *Api) UpdateAll(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) DeleteAll(params Params) IOutput {
+func (self *Api) DeleteAll(ctx IContext) IOutput {
 	return nil
 }

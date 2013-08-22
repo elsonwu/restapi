@@ -2,12 +2,9 @@ package restapi
 
 import (
 	"encoding/json"
-	// "errors"
+	"fmt"
 	"net/http"
-	// "net/url"
-	// "fmt"
 	"strings"
-	// "reflect"
 )
 
 const (
@@ -27,40 +24,98 @@ type IQuery interface {
 	Set(string, string)
 }
 
-type Params struct {
-	Query IQuery
-}
-
 type Map map[string]interface{}
 
-func bind(apiName string) {
-	http.HandleFunc("/"+apiName+"/", func(res http.ResponseWriter, req *http.Request) {
-		params := Params{}
-		params.Query = req.URL.Query()
+func requestApiMethod(req *http.Request, ctx IContext) string {
+	var method string
+	if "GET" == req.Method {
+		if "" == ctx.Query().Get("id") {
+			method = MethodList
+		} else {
+			method = MethodView
+		}
+	} else if "POST" == req.Method {
+		method = MethodCreate
+	} else if "PUT" == req.Method {
+		if "" == ctx.Query().Get("id") {
+			method = MethodUpdateAll
+		} else {
+			method = MethodUpdate
+		}
+	} else if "DELETE" == req.Method {
+		if "" == ctx.Query().Get("id") {
+			method = MethodDeleteAll
+		} else {
+			method = MethodDelete
+		}
+	}
+
+	return method
+}
+
+func Get(apiName string) IApi {
+	return _apis.Get(apiName)
+}
+
+func Call(apiName, method string, ctx IContext) IOutput {
+	api := Get(apiName)
+
+	if nil != api {
+		if MethodView == method {
+			return api.View(ctx)
+		} else if MethodCreate == method {
+			return api.Create(ctx)
+		} else if MethodUpdate == method {
+			return api.Update(ctx)
+		} else if MethodDelete == method {
+			return api.Delete(ctx)
+		} else if MethodList == method {
+			return api.List(ctx)
+		} else if MethodUpdateAll == method {
+			return api.UpdateAll(ctx)
+		} else if MethodDeleteAll == method {
+			return api.DeleteAll(ctx)
+		} else {
+			fmt.Println("API ", apiName, " method ", method, " does not exist")
+		}
+	}
+
+	return nil
+}
+
+func Add(apiName string, api IApi) {
+	_apis.Add(apiName, api)
+}
+
+func Run(bindString string) {
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		ctx := &Context{query: req.URL.Query(), req: req, res: res}
 		if "POST" == req.Method || "PUT" == req.Method {
 			req.ParseForm()
 		}
 
-		if "GET" == req.Method || "PUT" == req.Method || "DELETE" == req.Method {
-			_id := strings.Trim(strings.TrimPrefix(req.URL.Path, "/"+apiName), "/")
-			if "" != _id {
-				params.Query.Add("id", _id)
+		paths := strings.Split(req.URL.Path, "/")
+		lenPaths := len(paths)
+		if 1 == lenPaths {
+			http.Error(res, "API Not found", 404)
+			return
+		}
+
+		if 2 < lenPaths && ("GET" == req.Method || "PUT" == req.Method || "DELETE" == req.Method) {
+			if "" != paths[2] {
+				ctx.Query().Add("id", paths[2])
 			}
 		}
 
-		handler := new(Handler)
-		handler.req = req
-		handler.res = res
-
-		method := requestApiMethod(req, params)
+		method := requestApiMethod(req, ctx)
 		if "" == method {
 			http.Error(res, "Request does not acceptable", 400)
 			return
 		}
 
-		output := handler.Call(apiName, method, params)
+		output := Call(paths[1], method, ctx)
 		if nil == output {
-			http.Error(res, "API Not found", 404)
+			http.Error(res, "API Not found, api error:"+paths[1], 404)
 			return
 		}
 
@@ -72,40 +127,6 @@ func bind(apiName string) {
 		res.Header().Set("Content-Type", "application/json")
 		res.Write([]byte(data))
 	})
-}
 
-func requestApiMethod(req *http.Request, params Params) string {
-	var method string
-	if "GET" == req.Method {
-		if "" == params.Query.Get("id") {
-			method = MethodList
-		} else {
-			method = MethodView
-		}
-	} else if "POST" == req.Method {
-		method = MethodCreate
-	} else if "PUT" == req.Method {
-		if "" == params.Query.Get("id") {
-			method = MethodUpdateAll
-		} else {
-			method = MethodUpdate
-		}
-	} else if "DELETE" == req.Method {
-		if "" == params.Query.Get("id") {
-			method = MethodDeleteAll
-		} else {
-			method = MethodDelete
-		}
-	}
-
-	return method
-}
-
-func Add(apiName string, api IApi) {
-	_apis.Add(apiName, api)
-	bind(apiName)
-}
-
-func Run(bindString string) {
 	http.ListenAndServe(bindString, nil)
 }
