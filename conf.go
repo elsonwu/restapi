@@ -8,13 +8,17 @@ import (
 var Conf *Config
 
 func init() {
-	Conf = &Config{ResponseFunc: DefaultResponseFunc}
+	Conf = &Config{
+		ResponseFunc: DefaultResponseFunc,
+		RouterFunc:   DefaultRouterFunc,
+	}
 }
 
 type ResponseFunc func(output IOutput, ctx IContext, res http.ResponseWriter, req *http.Request)
 
 type Config struct {
 	ResponseFunc ResponseFunc
+	RouterFunc   RouterFunc
 }
 
 func DefaultResponseFunc(output IOutput, ctx IContext, res http.ResponseWriter, req *http.Request) {

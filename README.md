@@ -75,7 +75,8 @@
 	
 #API calls another API
 
-    //user api create method calls content api view method.
+user api create method calls content api view method.
+
 	func (self *User) Create(ctx restapi.IContext) restapi.IOutput {
 		query := ctx.Query()
 		query.Add("with_content_comments", "1")
@@ -83,21 +84,32 @@
 	}
 	
 #Customized API response
-	//You don't like my defualt response or even don't like to return json?
+You don't like my defualt response or even don't like to return json?
+
+	//Default
 	{
 		"result": <bool>,
 		"errors": []string,
 		"data": interface{}
 	}
 	
-	//You can use your customized response method
-	//customized responseFunc, do it before restapi.Run
+You can use your customized response method
+customized responseFunc, do it before restapi.Run
+
 	restapi.Conf.ResponseFunc = func(output restapi.IOutput, ctx restapi.IContext, res http.ResponseWriter, req *http.Request) {
 	 	res.Write([]byte("hello elson"))
 	}
 	
+#Customized API RouterFunc
+If you want to handle the request yourself, you can replace the default routerFunc.
+In this example, all requests will call content view method
+
+	restapi.Conf.RouterFunc = func(ctx restapi.IContext, res http.ResponseWriter, req *http.Request) (apiName, method string, ok bool) {
+		return "content", restapi.MethodView, true
+	}
+		
 #Customized API output
-	//If you don't likt to use the default restapi.Output() method, you can return the struct which implements IOutput interface
+If you don't likt to use the default restapi.Output() method, you can return the struct which implements IOutput interface
 	
 	type IOutput interface {
 		Result() bool
