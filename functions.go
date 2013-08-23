@@ -1,8 +1,6 @@
 package restapi
 
 import (
-	"encoding/json"
-	// "fmt"
 	"net/http"
 	"strings"
 )
@@ -127,6 +125,7 @@ func Add(apiName string, api IApi) {
 func Run(bindString string) {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		ctx := &Context{query: req.URL.Query(), req: req, res: res}
+
 		if "POST" == req.Method || "PUT" == req.Method {
 			req.ParseForm()
 		}
@@ -156,13 +155,7 @@ func Run(bindString string) {
 			return
 		}
 
-		o := map[string]interface{}{}
-		o["result"] = output.Result()
-		o["data"] = output.Data()
-		o["errors"] = output.Errors()
-		data, _ := json.Marshal(o)
-		res.Header().Set("Content-Type", "application/json")
-		res.Write([]byte(data))
+		Conf.ResponseFunc(output, ctx, res, req)
 	})
 
 	http.ListenAndServe(bindString, nil)
