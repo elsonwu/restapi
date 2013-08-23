@@ -35,7 +35,7 @@ type IApi interface {
 	UpdateAll(IContext) IOutput
 	DeleteAll(IContext) IOutput
 
-	BeforeRun(IContext) error
+	BeforeCall(IContext) error
 	BeforeView(IContext) error
 	BeforeList(IContext) error
 	BeforeCreate(IContext) error
@@ -75,7 +75,7 @@ func (self *Api) DeleteAll(ctx IContext) IOutput {
 	return nil
 }
 
-func (self *Api) BeforeRun(IContext) error {
+func (self *Api) BeforeCall(IContext) error {
 	return nil
 }
 

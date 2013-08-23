@@ -36,7 +36,7 @@ func Call(apiName, method string, ctx IContext) IOutput {
 		return nil
 	}
 
-	err = api.BeforeRun(ctx)
+	err = api.BeforeCall(ctx)
 	if nil != err {
 		return Output(false, nil, []string{err.Error()})
 	}

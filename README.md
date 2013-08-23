@@ -47,7 +47,7 @@
 	}
 
 	//filter for any call to user API
-	func (self *User) BeforeRun(ctx restapi.IContext) error {
+	func (self *User) BeforeCall(ctx restapi.IContext) error {
 		if "" == ctx.Query().Get("key") {
 			return errors.New("key is missing")
 		}
@@ -85,7 +85,7 @@ You can also Emit the filter youself
 
 #All available filters
 ##API level
-	BeforeRun: before api all methods run
+	BeforeCall: before api all methods run
 	BeforeView: before api View method run
 	BeforeList: before api List method run
 	BeforeUpdate: before api Update method run
