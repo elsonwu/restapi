@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"strings"
 )
@@ -53,34 +53,71 @@ func requestApiMethod(req *http.Request, ctx IContext) string {
 	return method
 }
 
-func Get(apiName string) IApi {
-	return _apis.Get(apiName)
-}
-
 func Call(apiName, method string, ctx IContext) IOutput {
-	api := Get(apiName)
+	api := _apis.Get(apiName)
 
-	if nil != api {
-		if MethodView == method {
-			return api.View(ctx)
-		} else if MethodCreate == method {
-			return api.Create(ctx)
-		} else if MethodUpdate == method {
-			return api.Update(ctx)
-		} else if MethodDelete == method {
-			return api.Delete(ctx)
-		} else if MethodList == method {
-			return api.List(ctx)
-		} else if MethodUpdateAll == method {
-			return api.UpdateAll(ctx)
-		} else if MethodDeleteAll == method {
-			return api.DeleteAll(ctx)
-		} else {
-			fmt.Println("API ", apiName, " method ", method, " does not exist")
-		}
+	if nil == api {
+		return nil
 	}
 
-	return nil
+	err := api.BeforeRun(ctx)
+	if nil != err {
+		return Output(false, nil, []string{err.Error()})
+	}
+
+	var output IOutput
+	switch method {
+	case MethodView:
+		err := api.BeforeView(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.View(ctx)
+
+	case MethodCreate:
+		err := api.BeforeCreate(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.Create(ctx)
+
+	case MethodUpdate:
+		err := api.BeforeUpdate(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.Update(ctx)
+
+	case MethodDelete:
+		err := api.BeforeDelete(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.Delete(ctx)
+
+	case MethodList:
+		err := api.BeforeList(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.List(ctx)
+
+	case MethodUpdateAll:
+		err := api.BeforeUpdateAll(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.UpdateAll(ctx)
+
+	case MethodDeleteAll:
+		err := api.BeforeDeleteAll(ctx)
+		if nil != err {
+			return Output(false, nil, []string{err.Error()})
+		}
+		output = api.DeleteAll(ctx)
+	}
+
+	return output
 }
 
 func Add(apiName string, api IApi) {

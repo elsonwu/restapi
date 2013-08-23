@@ -5,10 +5,15 @@ import (
 	"github.com/elsonwu/restapi"
 	// "net/http"
 	// "time"
+	"errors"
 )
 
 type User struct {
 	restapi.Api
+}
+
+func (self *User) BeforeRun(ctx restapi.IContext) error {
+	return errors.New("test err")
 }
 
 func (self *User) View(ctx restapi.IContext) restapi.IOutput {

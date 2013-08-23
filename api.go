@@ -34,6 +34,15 @@ type IApi interface {
 	Delete(IContext) IOutput
 	UpdateAll(IContext) IOutput
 	DeleteAll(IContext) IOutput
+
+	BeforeRun(IContext) error
+	BeforeView(IContext) error
+	BeforeList(IContext) error
+	BeforeCreate(IContext) error
+	BeforeUpdate(IContext) error
+	BeforeDelete(IContext) error
+	BeforeUpdateAll(IContext) error
+	BeforeDeleteAll(IContext) error
 }
 
 type Api struct{}
@@ -63,5 +72,37 @@ func (self *Api) UpdateAll(ctx IContext) IOutput {
 }
 
 func (self *Api) DeleteAll(ctx IContext) IOutput {
+	return nil
+}
+
+func (self *Api) BeforeRun(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeView(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeList(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeCreate(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeUpdate(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeDelete(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeUpdateAll(IContext) error {
+	return nil
+}
+
+func (self *Api) BeforeDeleteAll(IContext) error {
 	return nil
 }
