@@ -34,7 +34,7 @@
     	"result": true
 	}
 	
-#Api filter
+#API filter(API level)
 	package main
 
 	import (
@@ -69,13 +69,38 @@
     	"result": false
 	}
 	
-#All available filters
-	BeforeRun, BeforeView, BeforeList, BeforeUpdate, BeforeCreate, BeforeDelete, BeforeUpdateAll, BeforeDeleteAll
+#API filter(Global level)
 
+Use Filter to add any filter as you want
+
+	restapi.Filter.On("beforeHandleRequest", func(ctx restapi.IContext) error {
+		return errors.New("Sorry, stop")
+	})	
+	
+You can also Emit the filter youself
+
+	err := restapi.Filter.Emit("beforeHandleRequest")
+	fmt.Println(err)
+	//"Sorry, stop"
+
+#All available filters
+##API level
+	BeforeRun: before api all methods run
+	BeforeView: before api View method run
+	BeforeList: before api List method run
+	BeforeUpdate: before api Update method run
+	BeforeCreate: before api Create method run
+	BeforeDelete: before api Delete method run
+	BeforeUpdateAll: before api UpdateAll method run
+	BeforeDeleteAll: before api DeleteAll method run
+	
+##Global level
+	beforeHandleRequest: before everything start
+	beforeCall: before all api call
 	
 #API calls another API
 
-user api create method calls content api view method.
+Here user api create method calls content api view method, and also add more parameter for it.
 
 	func (self *User) Create(ctx restapi.IContext) restapi.IOutput {
 		query := ctx.Query()
@@ -84,7 +109,7 @@ user api create method calls content api view method.
 	}
 	
 #Customized API response
-You don't like my defualt response or even don't like to return json?
+You don't like the defualt response data struct or even don't like json?
 
 	//Default
 	{
@@ -93,10 +118,9 @@ You don't like my defualt response or even don't like to return json?
 		"data": interface{}
 	}
 	
-You can use your customized response method
-customized responseFunc, do it before restapi.Run
+You can use your customized response method, do it before restapi.Run
 
-	restapi.Conf.ResponseFunc = func(output restapi.IOutput, ctx restapi.IContext, res http.ResponseWriter, req *http.Request) {
+	restapi.Conf.ResponseFunc = func(output restapi.IOutput, ctx restapi.IContext) {
 	 	res.Write([]byte("hello elson"))
 	}
 	
@@ -104,12 +128,12 @@ customized responseFunc, do it before restapi.Run
 If you want to handle the request yourself, you can replace the default routerFunc.
 In this example, all requests will call content view method
 
-	restapi.Conf.RouterFunc = func(ctx restapi.IContext, res http.ResponseWriter, req *http.Request) (apiName, method string, ok bool) {
+	restapi.Conf.RouterFunc = func(ctx restapi.IContext) (apiName, method string, ok bool) {
 		return "content", restapi.MethodView, true
 	}
 		
 #Customized API output
-If you don't likt to use the default restapi.Output() method, you can return the struct which implements IOutput interface
+If you don't like the default restapi.Output() method, you can return the struct which implements IOutput interface
 	
 	type IOutput interface {
 		Result() bool

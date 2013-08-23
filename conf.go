@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"encoding/json"
-	"net/http"
+	// "net/http"
 )
 
 var Conf *Config
@@ -14,19 +14,19 @@ func init() {
 	}
 }
 
-type ResponseFunc func(output IOutput, ctx IContext, res http.ResponseWriter, req *http.Request)
+type ResponseFunc func(output IOutput, ctx IContext)
 
 type Config struct {
 	ResponseFunc ResponseFunc
 	RouterFunc   RouterFunc
 }
 
-func DefaultResponseFunc(output IOutput, ctx IContext, res http.ResponseWriter, req *http.Request) {
+func DefaultResponseFunc(output IOutput, ctx IContext) {
 	o := map[string]interface{}{}
 	o["result"] = output.Result()
 	o["data"] = output.Data()
 	o["errors"] = output.Errors()
 	data, _ := json.Marshal(o)
-	res.Header().Set("Content-Type", "application/json")
-	res.Write([]byte(data))
+	ctx.Res().Header().Set("Content-Type", "application/json")
+	ctx.Res().Write([]byte(data))
 }

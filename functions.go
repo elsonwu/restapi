@@ -23,41 +23,20 @@ type IQuery interface {
 
 type Map map[string]interface{}
 
-func requestApiMethod(req *http.Request, ctx IContext) string {
-	var method string
-	if "GET" == req.Method {
-		if "" == ctx.Query().Get("id") {
-			method = MethodList
-		} else {
-			method = MethodView
-		}
-	} else if "POST" == req.Method {
-		method = MethodCreate
-	} else if "PUT" == req.Method {
-		if "" == ctx.Query().Get("id") {
-			method = MethodUpdateAll
-		} else {
-			method = MethodUpdate
-		}
-	} else if "DELETE" == req.Method {
-		if "" == ctx.Query().Get("id") {
-			method = MethodDeleteAll
-		} else {
-			method = MethodDelete
-		}
+func Call(apiName, method string, ctx IContext) IOutput {
+
+	err := Filter.Emit("beforeCall", ctx)
+	if nil != err {
+		return Output(false, nil, []string{err.Error()})
 	}
 
-	return method
-}
-
-func Call(apiName, method string, ctx IContext) IOutput {
 	api := _apis.Get(apiName)
 
 	if nil == api {
 		return nil
 	}
 
-	err := api.BeforeRun(ctx)
+	err = api.BeforeRun(ctx)
 	if nil != err {
 		return Output(false, nil, []string{err.Error()})
 	}
@@ -124,12 +103,17 @@ func Add(apiName string, api IApi) {
 func Run(bindString string) {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		ctx := &Context{query: req.URL.Query(), req: req, res: res}
+		err := Filter.Emit("beforeHandleRequest", ctx)
+		if nil != err {
+			http.Error(res, err.Error(), 404)
+			return
+		}
 
 		if "POST" == req.Method || "PUT" == req.Method {
 			req.ParseForm()
 		}
 
-		apiName, method, ok := Conf.RouterFunc(ctx, res, req)
+		apiName, method, ok := Conf.RouterFunc(ctx)
 		if !ok {
 			return
 		}
@@ -150,7 +134,7 @@ func Run(bindString string) {
 			return
 		}
 
-		Conf.ResponseFunc(output, ctx, res, req)
+		Conf.ResponseFunc(output, ctx)
 	})
 
 	http.ListenAndServe(bindString, nil)
